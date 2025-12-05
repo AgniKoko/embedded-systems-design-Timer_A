@@ -1,0 +1,26 @@
+# IAR build output
+**/Obj/
+**/Exe/
+**/Lst/
+**/Debug/
+**/Release/
+
+# IAR debug / parser databases
+**/settings/*.crun
+**/settings/*.dbgdt
+**/settings/*.cspy*
+**/settings/*.dni
+**/settings/*.wsdt
+**/settings/*.wspos
+
+# Generic C/C++ build artefacts
+*.o
+*.obj
+*.map
+*.pdb
+*.ilk
+
+# Editor settings (optional)
+.vscode/
+*.user
+*.swp
