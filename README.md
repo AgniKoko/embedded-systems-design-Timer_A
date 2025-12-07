@@ -25,7 +25,7 @@ and control registers).
     - `TimerA_ChannelConfig` – per-channel compare/PWM configuration
     - `TimerA_PWMConfig` – convenience struct for PWM setup
   - public API prototypes (`TimerA_ApplyConfig`, `TimerA_ConfigureChannel`,
-    `TimerA_ConfigPWM`, `TimerA_Start`, `TimerA_Stop`, etc.).   
+    `TimerA_ConfigPWM`, `TimerA_Start`, `TimerA_Stop`, etc.).
 
 - `timerA_HAL_19.c`  
   Implementation of the HAL on top of the memory-mapped Timer_A control
@@ -43,7 +43,7 @@ and control registers).
       `TimerA_StartInMode`, `TimerA_Stop`,
       `TimerA_GetCounter`, `TimerA_ResetCounter`,
       `TimerA_SetPeriod`, `TimerA_SetDuty`,
-      `TimerA_GetCaptureCompare`.   
+      `TimerA_GetCaptureCompare`. 
 
 - `timerA_main_19.c`  
   Example `main()` demonstrating how to use the HAL:
@@ -56,7 +56,7 @@ and control registers).
   3. **Example 3 – Dynamic duty-cycle change**  
      Changes the CCR1 duty cycle at run-time (50 % → 75 % → 25 %) using
      `TimerA_SetDuty()` and reads back the CCR1 value with
-     `TimerA_GetCaptureCompare()`.   
+     `TimerA_GetCaptureCompare()`. 
 
 ## Target platform & dependencies
 
@@ -65,7 +65,7 @@ and control registers).
 - The implementation assumes that the vendor device header  
   (e.g. `msp430x14x.h`) is available in the include path so that the
   memory-mapped registers (`TACTL`, `TAR`, `TACCTL0–2`, `TACCR0–2`, …) are
-  defined. :contentReference[oaicite:4]{index=4}  
+  defined.  
 - Typical toolchains: IAR Embedded Workbench, Code Composer Studio, or other
   MSP430-compatible compilers.
 
@@ -73,4 +73,52 @@ and control registers).
 
 Basic Timer_A configuration as a simple counter:
 
+```c
+#include "timerA_HAL_19.h"
 
+void example_counter(void)
+{
+    TimerA_Config cfg;
+
+    cfg.clockSource          = CLOCK_SMCLK;
+    cfg.clockDivider         = DIV_8;
+    cfg.mode                 = MODE_UP;
+    cfg.period               = 1000u;
+    cfg.enableTimerInterrupt = 0u;
+
+    TimerA_ApplyConfig(&cfg);
+    TimerA_Start();
+
+    DOUBLE_BYTE t1 = TimerA_GetCounter();
+    // ...
+    TimerA_Stop();
+}
+```
+
+Basic PWM configuration on CCR1:
+
+```c
+void example_pwm(void)
+{
+    TimerA_PWMConfig pwm;
+
+    pwm.channel    = CC_REGISTER_1;
+    pwm.period     = 1000u;  // TACCR0
+    pwm.duty       = 500u;   // TACCR1 -> 50% duty
+    pwm.outputMode = OUTMODE_RST_SET;
+
+    TimerA_ConfigPWM(&pwm);
+    TimerA_Start();          // already running after ConfigPWM(), but safe
+}
+```
+
+## Documentation
+
+The full course report describing the theoretical background, design choices
+and mapping to the MSP430x1xx Timer_A control registers is available under:
+
+- `docs/timerA_report.pdf`
+
+An HTML/Markdown summary is also provided in:
+
+- `docs/index.md`
