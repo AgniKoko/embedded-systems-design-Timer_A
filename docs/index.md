@@ -1,5 +1,3 @@
-[<- Back to GitHub repository](https://github.com/AgniKoko/embedded-systems-design-Timer_A)
-
 # Timer_A HAL – Documentation
 
 This page documents the Timer_A Hardware Abstraction Layer (HAL) implemented
@@ -10,6 +8,8 @@ The aim of the HAL is to make the Timer_A peripheral easier and safer to use by
 exposing a small, high-level API instead of raw register accesses. The design
 follows the structure of chapter 11 of the MSP430x1xx User’s Guide and the
 GPIO HAL developed in the lab sessions. 
+
+[<- Back to GitHub repository](https://github.com/AgniKoko/embedded-systems-design-Timer_A)
 
 ---
 
