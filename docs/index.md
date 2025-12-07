@@ -1,3 +1,5 @@
+[<- Back to GitHub repository](https://github.com/AgniKoko/embedded-systems-design-Timer_A)
+
 # Timer_A HAL – Documentation
 
 This page documents the Timer_A Hardware Abstraction Layer (HAL) implemented
