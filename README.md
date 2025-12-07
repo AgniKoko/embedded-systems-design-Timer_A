@@ -11,6 +11,9 @@ same philosophy as the GPIO HAL used in the lab exercises and is based on
 chapter 11 of the official *MSP430x1xx User’s Guide* (Timer_A module description
 and control registers).
 
+<img width="693" height="690" alt="image" src="https://github.com/user-attachments/assets/83c7dd3b-e349-4076-b17a-ac765326a2ac" />
+
+
 ## File overview
 
 - `timerA_HAL_19.h`  
