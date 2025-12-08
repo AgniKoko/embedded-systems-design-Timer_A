@@ -24,7 +24,7 @@ GPIO HAL developed in the lab sessions.
 
 ---
 
-## 2. Implementation walkthrough (step-by-step)
+## 2. Implementation walkthrough 
 
 This section summarises, step by step, how the Timer_A HAL and examples were
 implemented.
