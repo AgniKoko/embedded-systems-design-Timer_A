@@ -27,49 +27,48 @@ static TimerA_Mode g_lastConfiguredMode = MODE_STOP;
 /* ======== Internal static helper functions ======== */
 
 // TACCTLx selecting function
-static volatile unsigned int* TimerA_getTacctlReg(TimerA_CCRegister channel)
+static volatile unsigned short* TimerA_getTacctlReg(TimerA_Channel channel)
 {
     switch (channel)
     {
-    case CC_REGISTER_0: return &TACCTL0;
-    case CC_REGISTER_1: return &TACCTL1;
-    case CC_REGISTER_2: return &TACCTL2;
-    default:            return (volatile unsigned int*)0;
+    case CHANNEL_0: return &TACCTL0;
+    case CHANNEL_1: return &TACCTL1;
+    case CHANNEL_2: return &TACCTL2;
+    default:        return (volatile unsigned short*)0;
     }
 }
 
 // TACCRx selecting function
-static volatile TimerA_TACCR_t* TimerA_getTaccrReg(TimerA_CCRegister channel)
+static volatile TimerA_TACCR* TimerA_getTaccrReg(TimerA_Channel channel)
 {
     switch (channel)
     {
-    case CC_REGISTER_0: return &TACCR0;
-    case CC_REGISTER_1: return &TACCR1;
-    case CC_REGISTER_2: return &TACCR2;
-    default:            return (volatile TimerA_TACCR_t*)0;
+    case CHANNEL_0: return &TACCR0;
+    case CHANNEL_1: return &TACCR1;
+    case CHANNEL_2: return &TACCR2;
+    default:        return (volatile TimerA_TACCR*)0;
     }
 }
 
 
 /* ======== Public API implementation ======== */
 
-void TimerA_ApplyConfig(const TimerA_Config *cfg)
+void TimerA_ApplyConfig(const TimerA_Config* cfg)
 {
     if (!cfg)
         return;
     
     TACTL &= ~TACTL_MC_MASK; // bit-wise AND with reverse of the MC mask --> forces bits 5-4 of TACTL to be 0 (Stop Mode)
 
-    TACTL |= TACTL_TACLR;    // bit-wise OR with TACLR mask --> forces bit 2 of TACTo be 1 (Enable Clear)
-
+    TACTL |= TACTL_TACLR;    // bit-wise OR with TACLR mask --> forces bit 2 of TACTL to be 1 (Enable Clear)
+    
     TACTL &= ~TACTL_TAIFG;   // bit-wise AND with TAIFG --> forces bit 0 of TACTL to be 0 (Clear Interrupt Flag)
 
     TACTL &= ~(TACTL_TASSEL_MASK | TACTL_ID_MASK); // bit-wise AND with reverse of the (TASSEL_mask || ID_mask) --> forces clock source and divider to 0
     
     // Upload config settings to TACTL
     TACTL |= (((DOUBLE_BYTE)cfg->clockSource  & 0x3u) << 8)        // put cfg.Clocksource on TACTL bits 9-8 by sliding them by 8
-          |  (((DOUBLE_BYTE)cfg->clockDivider & 0x3u) << 6)        // put cfg.clockDivider on TACTL bits 7-6 by sliding them by 6
-          |  (((DOUBLE_BYTE)cfg->mode         & 0x3u) << 4);       // put cfg.clockDivider on TACTL bits 5-4 by sliding them by 4
+          |  (((DOUBLE_BYTE)cfg->clockDivider & 0x3u) << 6);       // put cfg.clockDivider on TACTL bits 7-6 by sliding them by 6
 
     TACTL &= ~TACTL_TAIE; // Clear TAIE 
     TACTL |= (((DOUBLE_BYTE)cfg->enableTimerInterrupt & 0x1u) << 1); // put cfg.enableTimerInterrupt on TACTL bit 1 by sliding them by 1
@@ -88,9 +87,9 @@ void TimerA_ConfigureChannel(const TimerA_ChannelConfig *chCfg)
         return;
     
     // cctl points to the TACCTLx register of the selected channel (CCR0 / CCR1 / CCR2)
-    volatile unsigned int   *cctl = TimerA_getTacctlReg(chCfg->channel);
+    volatile unsigned short *cctl = TimerA_getTacctlReg(chCfg->channel);
     // ccr points to the TACCRx register of the selected channel
-    volatile TimerA_TACCR_t *ccr  = TimerA_getTaccrReg(chCfg->channel);
+    volatile TimerA_TACCR *ccr  = TimerA_getTaccrReg(chCfg->channel);
 
     if (!cctl || !ccr)
         return;
@@ -157,14 +156,14 @@ void TimerA_ConfigPWM(const TimerA_PWMConfig *pwmCfg)
 void TimerA_Start(void)
 {
     TACTL &= ~TACTL_MC_MASK;
-    TACTL |= ((unsigned int)g_lastConfiguredMode & 0x3u) << 4;
+    TACTL |= ((DOUBLE_BYTE)g_lastConfiguredMode & 0x3u) << 4; // put cfg.clockDivider on TACTL bits 5-4 by sliding them by 4
 }
 
+// Not neccesary for this application
 void TimerA_StartInMode(TimerA_Mode mode)
 {
     g_lastConfiguredMode = mode;
-    TACTL &= ~TACTL_MC_MASK;
-    TACTL |= ((unsigned int)mode & 0x3u) << 4;
+    TimerA_Start();
 }
 
 void TimerA_Stop(void)
@@ -193,9 +192,9 @@ void TimerA_SetPeriod(DOUBLE_BYTE period)
 }
 
 
-void TimerA_SetDuty(TimerA_CCRegister channel, DOUBLE_BYTE dutyValue)
+void TimerA_SetDuty(TimerA_Channel channel, DOUBLE_BYTE dutyValue)
 {
-    volatile TimerA_TACCR_t *ccr = TimerA_getTaccrReg(channel);
+    volatile TimerA_TACCR *ccr = TimerA_getTaccrReg(channel);
     if (!ccr)
         return;
 
@@ -203,9 +202,9 @@ void TimerA_SetDuty(TimerA_CCRegister channel, DOUBLE_BYTE dutyValue)
 }
 
 
-DOUBLE_BYTE TimerA_GetCaptureCompare(TimerA_CCRegister channel)
+DOUBLE_BYTE TimerA_GetCaptureCompare(TimerA_Channel channel)
 {
-    volatile TimerA_TACCR_t *ccr = TimerA_getTaccrReg(channel);
+    volatile TimerA_TACCR *ccr = TimerA_getTaccrReg(channel);
     if (!ccr)
         return 0u;
 

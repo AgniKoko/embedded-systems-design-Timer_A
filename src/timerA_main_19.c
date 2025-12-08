@@ -1,102 +1,78 @@
 #include "timerA_HAL_19.h"
 
-// #include <msp430x14x.h>
+//#include <msp430x14x.h>
 
 int main(void)
 {
-    /* --------------------------------------------------------------------
-     * Example 1: Basic configuration of Timer_A as a simple counter
-     * ------------------------------------------------------------------ */
-
+    /* ============= IimerA Example: Simple Counting ============= */
+    // A struct to keep configuration values
     TimerA_Config basicCfg;
 
-    basicCfg.clockSource          = CLOCK_SMCLK;  /* clock source */
-    basicCfg.clockDivider         = DIV_8;        /* prescaler /8 */
-    basicCfg.mode                 = MODE_UP;      /* up to TACCR0 */
-    basicCfg.period               = 1000u;        /* period = 1000 ticks */
-    basicCfg.enableTimerInterrupt = 0u;           /* no timer interrupt */
+    basicCfg.clockSource          = CLOCK_SMCLK;  /* Clock source SMCLK */
+    basicCfg.clockDivider         = DIV_8;        /* Prescaler /8 */
+    basicCfg.mode                 = MODE_UP;      /* Counting Up to TACCR0 */
+    basicCfg.period               = 1000u;        /* Period = 1000 counts */
+    basicCfg.enableTimerInterrupt = 0u;           /* No timer interrupts */
 
-    /* Apply configuration (writes TACTL, TACCR0, etc.) */
+    // Apply TimerA configurations
     TimerA_ApplyConfig(&basicCfg);
-
-    /* Start Timer_A in the mode that we configured above */
-    TimerA_Start();
-
+     
     volatile unsigned long delay;
     DOUBLE_BYTE t1, t2, t3;
 
-    /* Simple software delay */
-    for (delay = 0; delay < 10000; ++delay) { }
-    t1 = TimerA_GetCounter();      /* read TAR */
-
-    for (delay = 0; delay < 10000; ++delay) { }
-    t2 = TimerA_GetCounter();      /* TAR has advanced */
-
-    /* Reset the counter (via TACLR bit) */
-    TimerA_ResetCounter();
-
-    for (delay = 0; delay < 10000; ++delay) { }
-    t3 = TimerA_GetCounter();      /* after reset it starts again from 0 */
-
-    /* Stop the timer */
-    TimerA_Stop();
-
-    /*
-     * At this point:
-     *  - t1, t2, t3 hold characteristic values of TAR,
-     *  - we have demonstrated the use of: ApplyConfig, Start,
-     *    GetCounter, Reset, Stop.
-     */
-
-
-    /* --------------------------------------------------------------------
-     * Example 2: Configure PWM on CCR1 with 50% duty cycle
-     * ------------------------------------------------------------------ */
-
-    TimerA_PWMConfig pwmCfg;
-
-    pwmCfg.channel    = CC_REGISTER_1;          /* use CCR1 */
-    pwmCfg.period     = 1000u;                     /* TACCR0 = 1000 */
-    pwmCfg.duty       = 500u;                      /* CCR1 = 500 -> 50% duty */
-    pwmCfg.outputMode = OUTMODE_RST_SET;    /* classic PWM mode (reset/set) */
-
-    /*
-     * Helper routine that:
-     *  - writes TACCR0 (period),
-     *  - configures TACCTL1 / TACCR1 for PWM,
-     *  - sets MC = up mode in TACTL.
-     */
-    TimerA_ConfigPWM(&pwmCfg);
-
-    /*
-     * Timer_A is already running in up mode after ConfigPWM(),
-     * but we can call Start() again for clarity.
-     */
+    // Initiate Timer_A in the as configured mode
     TimerA_Start();
 
-    /*
-     * If you connect the CCR1 output pin (e.g. P1.x) on the board,
-     * you should see a PWM waveform with 50% duty cycle.
-     */
+    // Read TAR after delays
+    for (delay = 0; delay < 5; ++delay);
+    t1 = TimerA_GetCounter();      /* read TAR */
+
+    for (delay = 0; delay < 10000; ++delay);
+    t2 = TimerA_GetCounter();      /* read TAR (t1<t2) */
+
+    // Reset the counter back to 0    
+    TimerA_ResetCounter();
+
+    for (delay = 0; delay < 10000; ++delay);
+    t3 = TimerA_GetCounter();      /* read TAR */
+
+    // Stop timer
+    TimerA_Stop();
 
 
-    /* --------------------------------------------------------------------
-     * Example 3: Dynamically change the duty cycle
-     * ------------------------------------------------------------------ */
+    /* =================== IimerA Example: PWM =================== */
 
-    /* Keep 50% duty for a while */
-    for (delay = 0; delay < 50000; ++delay) { }
+    // A struct to keep PWM configuration values
+    TimerA_PWMConfig pwmCfg;
 
-    /* Change to ~75% duty (CCR1 = 750) */
-    TimerA_SetDuty(CC_REGISTER_1, 750u);
+    pwmCfg.channel    = CHANNEL_1;          /* Duty cycle in TACCR1 */
+    pwmCfg.period     = 1000u;              /* Period = 1000 counts (in TACCR0)*/
+    pwmCfg.duty       = 500u;               /* Duty_Cycle = 500/1000 = 50% */
+    pwmCfg.outputMode = OUTMODE_RST_SET;    /* High to Low pulse (reset/set) */
 
-    for (delay = 0; delay < 50000; ++delay) { }
+    // Apply TimerA PWM configurations
+    TimerA_ConfigPWM(&pwmCfg); /* Immediate timer start after configurations*/
 
-    /* Change to ~25% duty (CCR1 = 250) */
-    TimerA_SetDuty(CC_REGISTER_1, 250u);
+    // PWM for a while with Duty_Cycle = 50%
+    for (delay = 0; delay < 50000; ++delay);
 
-    DOUBLE_BYTE ccr1_value = TimerA_GetCaptureCompare(CC_REGISTER_1);
-    (void)ccr1_value;  /* avoid "unused variable" warning if not used */
+    // Change Duty Cycle in TACCR1 from 50% to 750/1000 = 75%
+    TimerA_SetDuty(CHANNEL_1, 750u);
 
-    while (1){}
+    // PWM for a while with Duty_Cycle = 75%
+    for (delay = 0; delay < 50000; ++delay);
+
+    // Change Duty Cycle in TACCR1 from 75% to 250/1000 = 25%
+    TimerA_SetDuty(CHANNEL_1, 250u);
+    
+    // Read Duty Cycle value (250) in TACCR1
+    DOUBLE_BYTE ccr1_value = TimerA_GetCaptureCompare(CHANNEL_1);
+    
+    
+    
+    // !IGNORE!: Is to avoid "unused variable" warnings.
+    (void)t1; (void)t2; (void)t3; 
+    (void)ccr1_value;
+
+    while(1);
 }

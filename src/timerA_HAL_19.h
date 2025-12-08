@@ -1,8 +1,8 @@
 #ifndef TIMERA_HAL_19_H_
 #define TIMERA_HAL_19_H_
 
-typedef unsigned char  BYTE;            /* 8-bit unsigned */
-typedef unsigned int   DOUBLE_BYTE;     /* 16-bit unsigned */
+typedef unsigned char BYTE;         /* 8-bit unsigned */
+typedef unsigned int  DOUBLE_BYTE;  /* 16-bit unsigned */
 
 
 /* ======== TimerA high-level enums ======== */
@@ -10,24 +10,24 @@ typedef unsigned int   DOUBLE_BYTE;     /* 16-bit unsigned */
 /* ---------- TACTL enums ---------- */
 
 typedef enum {
-    CLOCK_TACLK = 0,   /* TASSELx = 00: external TACLK */
-    CLOCK_ACLK     ,   /* TASSELx = 01: ACLK */
-    CLOCK_SMCLK    ,   /* TASSELx = 10: SMCLK */
-    CLOCK_INCLK        /* TASSELx = 11: INCLK */
+    CLOCK_TACLK = 0,   /* TASSEL = 00: external TACLK */
+    CLOCK_ACLK     ,   /* TASSEL = 01: ACLK */
+    CLOCK_SMCLK    ,   /* TASSEL = 10: SMCLK */
+    CLOCK_INCLK        /* TASSEL = 11: INCLK */
 } TimerA_ClockSource;
 
 typedef enum {
-    DIV_1 = 0,  /* IDx = 00: ClockSource/1 */
-    DIV_2    ,  /* IDx = 01: ClockSource/2 */
-    DIV_4    ,  /* IDx = 10: ClockSource/4 */
-    DIV_8       /* IDx = 11: ClockSource/8 */
+    DIV_1 = 0,  /* ID = 00: ClockSource/1 */
+    DIV_2    ,  /* ID = 01: ClockSource/2 */
+    DIV_4    ,  /* ID = 10: ClockSource/4 */
+    DIV_8       /* ID = 11: ClockSource/8 */
 } TimerA_ClockDivider;
 
 typedef enum {
-    MODE_STOP       = 0,  /* MCx = 00: stop */
-    MODE_UP            ,  /* MCx = 01: up to TACCR0 */
-    MODE_CONTINUOUS    ,  /* MCx = 10: up to 0xFFFF */
-    MODE_UPDOWN           /* MCx = 11: up to TACCR0 / down to 0 */
+    MODE_STOP       = 0,  /* MC = 00: stop */
+    MODE_UP            ,  /* MC = 01: up to TACCR0 */
+    MODE_CONTINUOUS    ,  /* MC = 10: up to 0xFFFF */
+    MODE_UPDOWN           /* MC = 11: up to TACCR0 / down to 0 */
 } TimerA_Mode;
 
 /* --------------------------------- */
@@ -35,42 +35,28 @@ typedef enum {
 /* --------- TACCTLx enums --------- */
 
 typedef enum {
-    CC_REGISTER_0 = 0,  /*x = 0: TACCR0 Register*/
-    CC_REGISTER_1    ,  /*x = 1: TACCR1 Register*/
-    CC_REGISTER_2       /*x = 2: TACCR2 Register*/
-} TimerA_CCRegister;
+    CHANNEL_0 = 0,  /*x = 0: TACCR0 Register*/
+    CHANNEL_1    ,  /*x = 1: TACCR1 Register*/
+    CHANNEL_2       /*x = 2: TACCR2 Register*/
+} TimerA_Channel;
 
 typedef enum {
-    NO_CAPTURE           = 0, /* CMx = 00: no capture */
-    CAPTURE_RISING_EDGE     , /* CMx = 01: capture on rising edge */
-    CAPTURE_FALLING_EDGE    , /* CMx = 10: capture on falling edge */
-    CAPTURE_BOTH_EDGES        /* CMx = 11: capture on both edges */
-} TimerA_CaptureMode;
-
-typedef enum {
-    INPUT_CCIxA = 0, /* CCISx = 00: CCIxA */
-    INPUT_CCIxB    , /* CCISx = 01: CCIxB */
-    INPUT_GND      , /* CCISx = 10: GND */
-    INPUT_VCC        /* CCISx = 11: VCC */
-} TimerA_CCInput;
-
-typedef enum {
-    OUTMODE_OUT        = 0, /* OUTMODx = 000: use OUT bit value */
-    OUTMODE_SET           , /* OUTMODx = 001: set */
-    OUTMODE_TOGGLE_RST    , /* OUTMODx = 010: toggle/reset */
-    OUTMODE_SET_RST       , /* OUTMODx = 011: set/reset */
-    OUTMODE_TOGGLE        , /* OUTMODx = 100: toggle */
-    OUTMODE_RESET         , /* OUTMODx = 101: reset */
-    OUTMODE_TOGGLE_SET    , /* OUTMODx = 110: toggle/set */
-    OUTMODE_RST_SET         /* OUTMODx = 111: reset/set */
+    OUTMODE_OUT        = 0, /* OUTMOD = 000: use OUT bit value */
+    OUTMODE_SET           , /* OUTMOD = 001: set */
+    OUTMODE_TOGGLE_RST    , /* OUTMOD = 010: toggle/reset */
+    OUTMODE_SET_RST       , /* OUTMOD = 011: set/reset */
+    OUTMODE_TOGGLE        , /* OUTMOD = 100: toggle */
+    OUTMODE_RESET         , /* OUTMOD = 101: reset */
+    OUTMODE_TOGGLE_SET    , /* OUTMOD = 110: toggle/set */
+    OUTMODE_RST_SET         /* OUTMOD = 111: reset/set */
 } TimerA_OutputMode;
 
 /* --------------------------------- */
 
 
-/* ======== bitfield representations of registers ======== */
+/* ======== Bitfield representations of registers ======== */
 
-/* TACTL ? Timer_A Control Register */
+/* TACTL: Timer_A Control Register */
 typedef struct {
     unsigned int TAIFG   : 1; /* bit 0: Timer_A interrupt flag */
     unsigned int TAIE    : 1; /* bit 1: Timer_A interrupt enable */
@@ -85,9 +71,12 @@ typedef struct {
 typedef union {
     unsigned int        reg;
     TimerA_TACTL_bits   bits;
-} TimerA_TACTL_t;
+} TimerA_TACTL;
 
-/* TACCTLx ? Capture/Compare Control Register */
+/* TAR: Timer_A Register (count of Timer_A) */
+typedef DOUBLE_BYTE TimerA_TAR;
+
+/* TACCTLx: Capture/Compare Control Register */
 typedef struct {
     unsigned int CCIFG   : 1; /* bit 0: capture/compare interrupt flag */
     unsigned int COV     : 1; /* bit 1: capture overflow */
@@ -106,136 +95,111 @@ typedef struct {
 typedef union {
     unsigned int         reg;
     TimerA_TACCTL_bits   bits;
-} TimerA_TACCTL_t;
+} TimerA_TACCTL;
 
-/* TAR / TACCRx interpreted as 16-bit values */
-typedef DOUBLE_BYTE TimerA_TAR_t;
-typedef DOUBLE_BYTE TimerA_TACCR_t;
+/* TACCR: Timer_A capture/compare Register (capture/compare value) */
+typedef unsigned short TimerA_TACCR;
+
 
 /* ======== High-level configuration structs ======== */
 
 typedef struct {
-    TimerA_ClockSource  clockSource;
-    TimerA_ClockDivider clockDivider;
-    TimerA_Mode         mode;
-    DOUBLE_BYTE         period;               /* TACCR0 */
-    BYTE                enableTimerInterrupt; /* 0/1 -> TAIE */
+    TimerA_ClockSource  clockSource;          /* TASSEL */
+    TimerA_ClockDivider clockDivider;         /* ID */
+    TimerA_Mode         mode;                 /* MC */
+    DOUBLE_BYTE         period;               /* TACCR0 value */
+    BYTE                enableTimerInterrupt; /* TAIE */
 } TimerA_Config;
 
 typedef struct {
-    TimerA_CCRegister   channel;         /* 0,1,2 -> TACCR0/1/2 */
-    TimerA_OutputMode   outputMode;      /* OUTMOD bits */
-    DOUBLE_BYTE         compareValue;    /* TACCRx */
-    BYTE                enableInterrupt; /* 0/1 -> CCIE */
+    TimerA_Channel    channel;         /* x in TACCRx */
+    TimerA_OutputMode outputMode;      /* OUTMOD */
+    DOUBLE_BYTE       compareValue;    /* value of TACCRx */
+    BYTE              enableInterrupt; /* CCIE */
 } TimerA_ChannelConfig;
 
 typedef struct {
-    TimerA_CCRegister   channel;   /* CCR channel used for PWM */
-    DOUBLE_BYTE         period;    /* TACCR0 (PWM period) */
-    DOUBLE_BYTE         duty;      /* TACCRx (PWM duty) */
-    TimerA_OutputMode   outputMode;
+    TimerA_Channel    channel;    /* CCR channel used for PWM */
+    DOUBLE_BYTE       period;     /* PWM period -> TACCR0 value */
+    DOUBLE_BYTE       duty;       /* PWM duty cycle -> TACCRx value */
+    TimerA_OutputMode outputMode; /* OUTMOD */
 } TimerA_PWMConfig;
 
 
 /* ======== Public API prototypes ======== */
 
 /**
- * @brief          : writes on a specific bit of the PxOUT of a target port
- * @param port     : the port whose PxOUT should be modified
- * @param pinMask  : the mask to select the bit to be written
- * @param state    : the logic state to write to the selected bit of the PxOUT
- * @return         : N/A
+ * @brief           : applies configurations to TimerA TACTL and load period value to TACCR0
+ * @param cfg       : pointer to TimerA configuration struct
+ * @return          : N/A
  */
-void TimerA_ApplyConfig(const TimerA_Config *cfg);
+void TimerA_ApplyConfig(const TimerA_Config* cfg);
 
 /**
- * @brief          : writes on a specific bit of the PxOUT of a target port
- * @param port     : the port whose PxOUT should be modified
- * @param pinMask  : the mask to select the bit to be written
- * @param state    : the logic state to write to the selected bit of the PxOUT
- * @return         : N/A
+ * @brief           : applies configurations to a TimerA TACCRx channel 
+ * @param chCfg     : pointer to TimerA Channel configuration struct
+ * @return          : N/A
  */
-void TimerA_ConfigureChannel(const TimerA_ChannelConfig *chCfg);
+void TimerA_ConfigureChannel(const TimerA_ChannelConfig* chCfg);
 
 /**
- * @brief          : writes on a specific bit of the PxOUT of a target port
- * @param port     : the port whose PxOUT should be modified
- * @param pinMask  : the mask to select the bit to be written
- * @param state    : the logic state to write to the selected bit of the PxOUT
- * @return         : N/A
+ * @brief           : applies configurations for PWM using a TACCRx Channel
+ * @param pwmCfg    : pointer to PWM configuration struct
+ * @return          : N/A
  */
-void TimerA_ConfigPWM(const TimerA_PWMConfig *pwmCfg);
+void TimerA_ConfigPWM(const TimerA_PWMConfig* pwmCfg);
 
 /**
- * @brief          : writes on a specific bit of the PxOUT of a target port
- * @param port     : the port whose PxOUT should be modified
- * @param pinMask  : the mask to select the bit to be written
- * @param state    : the logic state to write to the selected bit of the PxOUT
- * @return         : N/A
+ * @brief           : starts Timer_A as configured in TACTL
+ * @return          : N/A
  */
 void TimerA_Start(void);
 
 /**
- * @brief          : writes on a specific bit of the PxOUT of a target port
- * @param port     : the port whose PxOUT should be modified
- * @param pinMask  : the mask to select the bit to be written
- * @param state    : the logic state to write to the selected bit of the PxOUT
- * @return         : N/A
+ * @brief           : starts Timer_A as configured in TACTL but in a specified mode MC
+ * @param mode      : the method MC the timer uses to count
+ * @return          : N/A
  */
 void TimerA_StartInMode(TimerA_Mode mode);
 
 /**
- * @brief          : writes on a specific bit of the PxOUT of a target port
- * @param port     : the port whose PxOUT should be modified
- * @param pinMask  : the mask to select the bit to be written
- * @param state    : the logic state to write to the selected bit of the PxOUT
- * @return         : N/A
+ * @brief           : halts Timer_A by clearing MC (Stop Mode)
+ * @return          : N/A
  */
 void TimerA_Stop(void);
 
 /**
- * @brief          : writes on a specific bit of the PxOUT of a target port
- * @param port     : the port whose PxOUT should be modified
- * @param pinMask  : the mask to select the bit to be written
- * @param state    : the logic state to write to the selected bit of the PxOUT
- * @return         : N/A
+ * @brief           : reads the current value of Timer_A counter TAR
+ * @return          : the current 16-bit value of TAR
  */
 DOUBLE_BYTE TimerA_GetCounter(void);
 
 /**
- * @brief          : writes on a specific bit of the PxOUT of a target port
- * @param port     : the port whose PxOUT should be modified
- * @param pinMask  : the mask to select the bit to be written
- * @param state    : the logic state to write to the selected bit of the PxOUT
- * @return         : N/A
+ * @brief           : resets Timer_A (TAR, ID, count direction) by setting TACLR of TACTL
+ * @return          : N/A
  */
 void TimerA_ResetCounter(void);
 
 /**
- * @brief          : writes on a specific bit of the PxOUT of a target port
- * @param port     : the port whose PxOUT should be modified
- * @param pinMask  : the mask to select the bit to be written
- * @param state    : the logic state to write to the selected bit of the PxOUT
- * @return         : N/A
+ * @brief           : writes on TACCR0 a new Period value for Timer_A
+ * @param period    : the 16-bit period value
+ * @return          : N/A
  */
 void TimerA_SetPeriod(DOUBLE_BYTE period);
 
 /**
- * @brief          : writes on a specific bit of the PxOUT of a target port
- * @param port     : the port whose PxOUT should be modified
- * @param pinMask  : the mask to select the bit to be written
- * @param state    : the logic state to write to the selected bit of the PxOUT
- * @return         : N/A
+ * @brief           : writes on a TACCRx Channel a new Duty Cycle value for PWM
+ * @param channel   : the Channel whose Duty Cycle should be modified
+ * @param dutyValue : the new Duty Cycle value of the Channel 
+ * @return          : N/A
  */
-void TimerA_SetDuty(TimerA_CCRegister channel, DOUBLE_BYTE dutyValue);
+void TimerA_SetDuty(TimerA_Channel channel, DOUBLE_BYTE dutyValue);
 
 /**
- * @brief          : writes on a specific bit of the PxOUT of a target port
- * @param port     : the port whose PxOUT should be modified
- * @param pinMask  : the mask to select the bit to be written
- * @param state    : the logic state to write to the selected bit of the PxOUT
- * @return         : N/A
+ * @brief           : reads the stored value of a TACCRx Channel
+ * @param channel   : the Channel whose value should be read
+ * @return          : the 16-bit value of the Channel
  */
-DOUBLE_BYTE TimerA_GetCaptureCompare(TimerA_CCRegister channel);
+DOUBLE_BYTE TimerA_GetCaptureCompare(TimerA_Channel channel);
 
 #endif /* TIMERA_HAL_19_H_ */
