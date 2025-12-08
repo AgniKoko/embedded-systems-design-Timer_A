@@ -137,4 +137,4 @@ For a more detailed explanation (in Greek) of the theoretical background and
 design choices, including references to the MSP430x1xx User’s Guide and course
 material, see:
 
-- [`timerA_report.pdf`](timerA_report.pdf)
+- [`timerA_report.pdf`](docs/timerA_report.pdf)
