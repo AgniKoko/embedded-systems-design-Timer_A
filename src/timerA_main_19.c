@@ -1,6 +1,5 @@
 #include "timerA_HAL_19.h"
 
-//#include <msp430x14x.h>
 
 int main(void)
 {

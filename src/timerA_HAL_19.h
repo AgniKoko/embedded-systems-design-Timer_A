@@ -5,6 +5,22 @@ typedef unsigned char BYTE;         /* 8-bit unsigned */
 typedef unsigned int  DOUBLE_BYTE;  /* 16-bit unsigned */
 
 
+/* ============ TimerA Register Addresses ============= */
+
+#define TACTL_ADDR   0x0160u  /* Timer_A Control */
+#define TAR_ADDR     0x0170u  /* Timer_A Counter */
+
+/* Capture/Compare Control Registers */
+#define TACCTL0_ADDR 0x0162u
+#define TACCTL1_ADDR 0x0164u
+#define TACCTL2_ADDR 0x0166u
+
+/* Capture/Compare Registers (compare values) */
+#define TACCR0_ADDR  0x0172u
+#define TACCR1_ADDR  0x0174u
+#define TACCR2_ADDR  0x0176u
+
+
 /* ======== TimerA high-level enums ======== */
 
 /* ---------- TACTL enums ---------- */
@@ -68,13 +84,20 @@ typedef struct {
     unsigned int         : 6; /* bits 10-15: unused */
 } TimerA_TACTL_bits;
 
+
 typedef union {
     unsigned int        reg;
     TimerA_TACTL_bits   bits;
 } TimerA_TACTL;
 
+// Align Bitfield and point to TACTL register
+#define TACTL  (*((volatile TimerA_TACTL*) TACTL_ADDR))
+
 /* TAR: Timer_A Register (count of Timer_A) */
 typedef DOUBLE_BYTE TimerA_TAR;
+
+// Point to TAR register
+#define TAR  (*((volatile TimerA_TAR*) TAR_ADDR))
 
 /* TACCTLx: Capture/Compare Control Register */
 typedef struct {
@@ -97,9 +120,18 @@ typedef union {
     TimerA_TACCTL_bits   bits;
 } TimerA_TACCTL;
 
+// Align Bitfields and point to TACCTLx registers
+#define TACCTL0  (*((volatile TimerA_TACCTL*) TACCTL0_ADDR))
+#define TACCTL1  (*((volatile TimerA_TACCTL*) TACCTL1_ADDR))
+#define TACCTL2  (*((volatile TimerA_TACCTL*) TACCTL2_ADDR))
+
 /* TACCR: Timer_A capture/compare Register (capture/compare value) */
 typedef unsigned short TimerA_TACCR;
 
+// Point to TACCRx registers
+#define TACCR0  (*((volatile TimerA_TACCR*) TACCR0_ADDR))
+#define TACCR1  (*((volatile TimerA_TACCR*) TACCR1_ADDR))
+#define TACCR2  (*((volatile TimerA_TACCR*) TACCR2_ADDR))
 
 /* ======== High-level configuration structs ======== */
 
